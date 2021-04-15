@@ -1,11 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var Product = require("../model/product.js");
 
 router.get('/all', async function(req, res) {
-    var products = await Product.findAll();
-
-    return res.status(200).json(products);
+    return res.status(200).json(2);
 });
 
 module.exports = router;
