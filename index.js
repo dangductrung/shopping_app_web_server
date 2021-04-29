@@ -14,6 +14,8 @@ const port = process.env.PORT || 5000
 
 app.use('/crawl', require('./routes/crawl'));
 app.use('/oauth', require('./routes/oauth'));
+app.use('/search', require('./routes/search'));
+app.use('/notification', require('./routes/notification'));
 
 
 var server=app.listen(4000, function(){
@@ -26,4 +28,4 @@ app.use(function (err, req, res, next) {
 })
 
   
-  module.exports = app;
+module.exports = app;
