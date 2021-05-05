@@ -5,8 +5,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const dateFormat = require('dateformat');
 
-const User = require('../models/user');
-const Session = require('../models/session');
+const Entity = require('../helper/entity.helper');
 
 router.post("/register", async function(req, res)  {
     let username = req.body.username;
@@ -20,7 +19,7 @@ router.post("/register", async function(req, res)  {
     const hash = bcrypt.hashSync(pw, salt);
 
     try {
-        const user = await User.create({
+        const user = await Entity.User.create({
             username: username,
             password: hash
         });
@@ -29,7 +28,7 @@ router.post("/register", async function(req, res)  {
         const expiredDate = new Date();
         expiredDate.setDate(expiredDate.getDate() + parseInt(process.env.EXPIRE))
     
-        const session = await Session.create({
+        const session = await Entity.Session.create({
             username: user.username,
             access_token: token,
             expired_at: dateFormat(expiredDate.toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd HH:MM:ss')
@@ -54,7 +53,7 @@ router.post("/login", async function(req, res) {
     }
 
     try {
-        const user = await User.findOne({
+        const user = await Entity.User.findOne({
             where: {
                 username: username
             }
@@ -77,7 +76,7 @@ router.post("/login", async function(req, res) {
         const expiredDate = new Date();
         expiredDate.setDate(expiredDate.getDate() + parseInt(process.env.EXPIRE))
     
-        const session = await Session.create({
+        const session = await Entity.Session.create({
             username: user.username,
             access_token: token,
             expired_at: dateFormat(expiredDate.toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd HH:MM:ss')

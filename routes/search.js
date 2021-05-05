@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const Product = require('../models/product');
 const { Sequelize, Model, DataTypes } = require('sequelize');
 const Op = Sequelize.Op;
+
+const Entity = require('../helper/entity.helper');
 const  authhelper = require("../helper/auth.helper");
 
 router.get('/all', async function(req, res) {
@@ -17,7 +18,7 @@ router.get('/all', async function(req, res) {
 
 
     try {
-        let products = await Product.findAll(
+        let products = await Entity.Product.findAll(
             {
                 where: {
                     name: {
