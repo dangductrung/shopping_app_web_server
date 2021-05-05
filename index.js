@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 const port = process.env.PORT || 5000
 
 app.use('/crawl', require('./routes/crawl'));
+app.use('/user', require('./routes/user'));
 app.use('/oauth', require('./routes/oauth'));
 app.use('/search', require('./routes/search'));
 app.use('/notification', require('./routes/notification'));
