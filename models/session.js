@@ -1,4 +1,4 @@
-const sequilize = require("../ultils/serialize.util");
+const sequilize = require("../ultils/serialize.server.util");
 const { Sequelize, Model, DataTypes } = require('sequelize');
 
 
