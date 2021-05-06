@@ -15,7 +15,11 @@ router.get('/', async function(req, res) {
     }
 
     let keyword = req.body["keyword"];
+    let page = req.query.page;
 
+    if(page == null) {
+        page = 0;
+    }
 
     try {
         let products = await Entity.Product.findAll(
@@ -24,7 +28,9 @@ router.get('/', async function(req, res) {
                     name: {
                         [Op.like]: "%" + keyword + "%"
                     }
-                }
+                },
+                limit: 10,
+                offset: page * 10
             }
         );
         return res.status(200).json(products);
