@@ -17,6 +17,7 @@ app.use('/oauth', require('./routes/oauth'));
 app.use('/search', require('./routes/search'));
 app.use('/notification', require('./routes/notification'));
 app.use('/product', require('./routes/product'));
+app.use('/follow', require('./routes/follow'));
 
 
 var server=app.listen(4000, function(){

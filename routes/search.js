@@ -6,7 +6,7 @@ const Op = Sequelize.Op;
 const Entity = require('../helper/entity.helper');
 const  authhelper = require("../helper/auth.helper");
 
-router.get('/all', async function(req, res) {
+router.get('/', async function(req, res) {
     let token = req.headers["token"];
     if(!(await authhelper.isAuth(token))) {
         return res.status(401).json({

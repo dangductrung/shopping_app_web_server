@@ -9,7 +9,7 @@ var Follow = sequilize.define('follows', {
           autoIncrement: true
     } ,
     username: DataTypes.STRING(255),
-    product_id: DataTypes.INTEGER,
+    link: DataTypes.STRING(1500),
 },  {timestamps: false,});
 
 
