@@ -3,6 +3,7 @@ var router = express.Router();
 
 const Entity = require('../helper/entity.helper');
 const  authhelper = require("../helper/auth.helper");
+const producthelper = require("../helper/product.helper");
 
 router.post('/add', async function(req, res) {
     let token = req.headers["token"];
@@ -153,11 +154,7 @@ router.get('/list', async function(req, res) {
                     order: [ [ 'created_at', 'DESC' ]]
                 });
 
-                let obj = {
-                    id: follows[i].id,
-                    product: product[0],
-                };
-                result.push(obj);
+                result.push(await producthelper.genPrd(product[0], token));
             }
         }
         
