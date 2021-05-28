@@ -8,10 +8,11 @@ var Product = sequilize.define('products', {
           primaryKey: true,
           autoIncrement: true
     } ,
-    name: DataTypes.STRING(300),
-    brand: DataTypes.STRING(255),
-    from: DataTypes.STRING(25),
-    link: DataTypes.STRING(255) ,
+    name: DataTypes.STRING(500),
+    image: DataTypes.STRING(1500),
+    brand: DataTypes.STRING(150),
+    from: DataTypes.STRING(45),
+    link: DataTypes.STRING(1500) ,
     match_id: DataTypes.INTEGER ,
     created_at: DataTypes.DATE ,
     current_price: DataTypes.FLOAT

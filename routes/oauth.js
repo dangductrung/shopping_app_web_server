@@ -23,6 +23,13 @@ router.post("/register", async function(req, res)  {
             username: username,
             password: hash
         });
+
+        const profile = await Entity.Profile.create({
+            username: username,
+            email: "",
+            phone: "",
+            name: "",
+        });
     
         const token = crypto.randomBytes(16).toString("hex");
         const expiredDate = new Date();

@@ -20,7 +20,7 @@ router.get('/latest', async function(req, res) {
                 order: [ [ 'created_at', 'DESC' ]]
             }
         );
-        return res.status(200).json(products);
+        return res.status(200).json(products); 
     } catch(e) {
         return res.status(400).json({
             message: e.toString()
