@@ -46,7 +46,8 @@ router.post('/add', async function(req, res) {
     
         await Entity.Follow.create({
             username: username,
-            link: product.link
+            link: product.link,
+            current_price: product.current_price
         });
     
         return res.status(200).json({

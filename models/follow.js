@@ -10,6 +10,7 @@ var Follow = sequilize.define('follows', {
     } ,
     username: DataTypes.STRING(255),
     link: DataTypes.STRING(1500),
+    current_price: DataTypes.FLOAT
 },  {timestamps: false,});
 
 

@@ -5,6 +5,7 @@ const Op = Sequelize.Op;
 
 const Entity = require('../helper/entity.helper');
 const authhelper = require("../helper/auth.helper");
+const producthelper = require("../helper/product.helper");
 
 router.get('/', async function(req, res) {
     let token = req.headers["token"];
@@ -49,7 +50,12 @@ router.get('/', async function(req, res) {
 
         prd_temp = prd_temp.slice(page * 10, (page * 10 + process.env.PAGE_LIMIT) > prd_temp.length ? prd_temp.length : page * 10 + process.env.PAGE_LIMIT);
 
-        return res.status(200).json(prd_temp);
+        let result = [];
+        for(i = 0; i < prd_temp.length; ++i) {
+            result.push(await producthelper.genPrd(prd_temp[i], token));
+        }
+
+        return res.status(200).json(result);
     }catch(e) {
         return res.status(400).json({
             message: e.toString()
