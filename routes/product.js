@@ -41,7 +41,29 @@ router.get('/chart', async function(req,res) {
             message: "Unauthorized"
         });
     }
-    
+
+    try {
+        let id = req.query.product;
+        let product = await Entity.Product.findOne({
+            where: {
+                id: id
+            },
+        });
+
+        let products = await Entity.Product.findAll({
+            attributes: ["id", "current_price", "created_at"],
+            where: {
+                link: product.link
+            },
+            order: [ [ 'created_at', 'ASC' ]]
+        });
+
+        return res.status(200).json(products); 
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
 });
 
 module.exports = router;
