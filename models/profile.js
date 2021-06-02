@@ -10,6 +10,7 @@ var Profile = sequilize.define('profiles', {
     email: DataTypes.STRING(100),
     phone: DataTypes.STRING(20),
     name: DataTypes.STRING(255),
+    point: DataTypes.INTEGER,
 },  {timestamps: false,});
 
 
