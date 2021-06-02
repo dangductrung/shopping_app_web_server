@@ -30,27 +30,28 @@ router.get('/', async function(req, res) {
             return res.status(200).json([]);
         }
 
-        let prd_temp = await Entity.Product.findAll(
-            {
-                where: {
-                    match_id: products[0].match_id,
-                },
-                order: [ [ 'created_at', 'DESC' ]]
-            }
-        );
-
-        for(i = 0; i < prd_temp.length; ++i) {
-            for(j = i + 1;j < prd_temp.length; ++j) {
-                if(prd_temp[j].link === prd_temp[i].link) {
-                    prd_temp = removeA(prd_temp, prd_temp[j]);
-                }
-            }
-        }
-        prd_temp = prd_temp.sort((prd1,prd2) => prd1.current_price > prd2.current_price ? 1 : (prd1.current_price < prd2.current_price) ? -1 : 0);
-
-        prd_temp = prd_temp.slice(page * 10, (page * 10 + process.env.PAGE_LIMIT) > prd_temp.length ? prd_temp.length : page * 10 + process.env.PAGE_LIMIT);
+        let count = 0;
 
         let result = [];
+        let prd_temp = [];
+
+        while(!(prd_temp.length >= (page + 1) * process.env.PAGE_LIMIT || count == products.length)) {
+            prd_temp = prd_temp.concat(await getList(products[count]));
+            ++count;
+        }
+
+        for(i = 0; i < prd_temp.length; ++i) {
+            let temp = prd_temp[i];
+            prd_temp = prd_temp.filter(function(item) {
+                return item.link !== prd_temp[i].link;
+            });
+            prd_temp.push(temp);
+        }
+
+
+        prd_temp = prd_temp.sort((prd1,prd2) => prd1.current_price > prd2.current_price ? 1 : (prd1.current_price < prd2.current_price) ? -1 : 0);
+        prd_temp = prd_temp.slice(page * process.env.PAGE_LIMIT, (page + 1) * process.env.PAGE_LIMIT > prd_temp.length ? prd_temp.length : page * 10 + process.env.PAGE_LIMIT);
+
         for(i = 0; i < prd_temp.length; ++i) {
             result.push(await producthelper.genPrd(prd_temp[i], token));
         }
@@ -72,6 +73,19 @@ function removeA(arr) {
         }
     }
     return arr;
+}
+
+async function getList(product) {
+    let prd_temp = await Entity.Product.findAll(
+        {
+            where: {
+                match_id: product.match_id,
+            },
+            order: [ [ 'created_at', 'DESC' ]]
+        }
+    );
+
+    return prd_temp;
 }
 
 module.exports = router;
