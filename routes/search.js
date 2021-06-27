@@ -8,6 +8,7 @@ const authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
 
 router.get('/', async function(req, res) {
+    let token = req.headers["token"];
     let keyword = req.body["keyword"];
     let page = req.query.page;
 

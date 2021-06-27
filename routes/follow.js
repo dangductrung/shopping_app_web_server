@@ -6,6 +6,7 @@ const  authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
 
 router.post('/add', async function(req, res) {
+    let token = req.headers["token"];
     let id = req.query.product;
     if(id == null || id === "" || id === undefined) {
         return res.status(400).json({
@@ -56,11 +57,6 @@ router.post('/add', async function(req, res) {
 
 router.post('/unfollow', async function(req, res) {
     let token = req.headers["token"];
-    if(!(await authhelper.isAuth(token))) {
-        return res.status(401).json({
-            message: "Unauthorized"
-        });
-    }
 
     let id = req.query.product;
     if(id == null || id === "" || id === undefined) {
@@ -113,6 +109,7 @@ router.post('/unfollow', async function(req, res) {
 });
 
 router.get('/list', async function(req, res) {
+    let token = req.headers["token"];
     let page = req.query.page;
 
     if(page == null) {
