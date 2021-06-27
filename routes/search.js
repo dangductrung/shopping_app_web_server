@@ -8,13 +8,6 @@ const authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
 
 router.get('/', async function(req, res) {
-    let token = req.headers["token"];
-    if(!(await authhelper.isAuth(token))) {
-        return res.status(401).json({
-            message: "Unauthorized"
-        });
-    }
-
     let keyword = req.body["keyword"];
     let page = req.query.page;
 

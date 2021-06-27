@@ -26,15 +26,12 @@ const isAuth = async (token) => {
 
 const getUserName = async (token) =>  {
     try {
-        if(!(await isAuth(token))) {
-            return null;
-        }
-    
         let session = await Session.findOne({
             where: {
                 access_token: token
             }
         });
+
         return session.username;
     }catch(e) {
         return null;
@@ -42,4 +39,15 @@ const getUserName = async (token) =>  {
     
 }
 
-module.exports = {isAuth, getUserName}
+const isAuthenticate = async (req, res, next) => {
+    let token = req.headers["token"];
+    if(!(await isAuth(token))) {
+        return res.status(401).json({
+            message: "Unauthorized"
+        });
+    } else {
+        next();
+    }
+}
+
+module.exports = {isAuth, getUserName, isAuthenticate}

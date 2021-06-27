@@ -8,12 +8,6 @@ const authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
 
 router.get('/latest', async function(req, res) {
-    let token = req.headers["token"];
-    if(!(await authhelper.isAuth(token))) {
-        return res.status(401).json({
-            message: "Unauthorized"
-        });
-    }
     try {
         let products = await Entity.Product.findAll(
             {
@@ -35,13 +29,6 @@ router.get('/latest', async function(req, res) {
 });
 
 router.get('/chart', async function(req,res) {
-    let token = req.headers["token"];
-    if(!(await authhelper.isAuth(token))) {
-        return res.status(401).json({
-            message: "Unauthorized"
-        });
-    }
-
     try {
         let id = req.query.product;
         let product = await Entity.Product.findOne({

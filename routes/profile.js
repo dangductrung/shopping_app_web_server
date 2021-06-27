@@ -6,13 +6,6 @@ const authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
 
 router.get('/info', async function(req,res) {
-    let token = req.headers["token"];
-    if(!(await authhelper.isAuth(token))) {
-        return res.status(401).json({
-            message: "Unauthorized"
-        });
-    }
-
     try {
     	let username = await authhelper.getUserName(token);
 	    let result = await Entity.Profile.findOne({
@@ -30,13 +23,6 @@ router.get('/info', async function(req,res) {
 });
 
 router.post('/update', async function(req,res) {
-    let token = req.headers["token"];
-    if(!(await authhelper.isAuth(token))) {
-        return res.status(401).json({
-            message: "Unauthorized"
-        });
-    }
-
     try {
     	let username = await authhelper.getUserName(token);
 
