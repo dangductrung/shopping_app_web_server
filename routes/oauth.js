@@ -82,6 +82,12 @@ router.post("/login", async function(req, res) {
         const token = crypto.randomBytes(16).toString("hex");
         const expiredDate = new Date();
         expiredDate.setDate(expiredDate.getDate() + parseInt(process.env.EXPIRE))
+
+        await Entity.Session.destroy({
+            where: {
+                username: username
+            }
+        });
     
         const session = await Entity.Session.create({
             username: user.username,
