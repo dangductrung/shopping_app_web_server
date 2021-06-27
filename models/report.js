@@ -9,7 +9,8 @@ var Report = sequilize.define('reports', {
           autoIncrement: true
     } ,
     title: DataTypes.STRING(255),
-    content: DataTypes.STRING(1500)
+    content: DataTypes.STRING(1500),
+    product_id: DataTypes.INTEGER
 },  {timestamps: false,});
 
 

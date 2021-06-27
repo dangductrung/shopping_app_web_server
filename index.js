@@ -20,6 +20,7 @@ app.use('/product',authhelper.isAuthenticate, require('./routes/product'));
 app.use('/follow', authhelper.isAuthenticate,require('./routes/follow'));
 app.use('/profile', authhelper.isAuthenticate,require('./routes/profile'));
 app.use('/fcm', authhelper.isAuthenticate,require('./routes/fcm'));
+app.use('/report', authhelper.isAuthenticate,require('./routes/report'));
 
 
 var server=app.listen(4000, function(){
