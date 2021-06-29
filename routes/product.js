@@ -8,6 +8,7 @@ const authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
 
 router.get('/latest', async function(req, res) {
+    let token = req.headers["token"];
     try {
         let products = await Entity.Product.findAll(
             {
