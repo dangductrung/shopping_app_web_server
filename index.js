@@ -3,6 +3,7 @@ const app = express();
 const morgan = require('morgan')
 const bodyParser = require('body-parser');
 const authhelper = require('./helper/auth.helper.js');
+const schedule = require('./schedule/schedule.js');
 
 require('dotenv').config()
 require('events').EventEmitter.prototype._maxListeners = 100;
@@ -22,6 +23,8 @@ app.use('/profile', authhelper.isAuthenticate,require('./routes/profile'));
 app.use('/fcm', authhelper.isAuthenticate,require('./routes/fcm'));
 app.use('/report', authhelper.isAuthenticate,require('./routes/report'));
 
+
+schedule.check_notification();
 
 var server=app.listen(4000, function(){
     console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
