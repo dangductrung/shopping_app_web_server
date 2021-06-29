@@ -62,7 +62,64 @@ router.post("/login", async function(req, res) {
     try {
         const user = await Entity.User.findOne({
             where: {
+                username: username,
+                is_admin: false
+            }
+        });
+
+        if(user == null) {
+            return res.status(404).json({
+                "message": "Username or password not found"
+            });
+        }
+
+        const isValidate = bcrypt.compareSync(pw, user.password);
+        if(!isValidate) {
+            return res.status(400).json({
+                "message": "Password is incorrect"
+            });
+        }
+
+        const token = crypto.randomBytes(16).toString("hex");
+        const expiredDate = new Date();
+        expiredDate.setDate(expiredDate.getDate() + parseInt(process.env.EXPIRE))
+
+        await Entity.Session.destroy({
+            where: {
                 username: username
+            }
+        });
+    
+        const session = await Entity.Session.create({
+            username: user.username,
+            access_token: token,
+            expired_at: dateFormat(expiredDate.toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd HH:MM:ss')
+        });
+        return res.status(200).json({
+            "access_token": session.access_token,
+            "expired_at": session.expired_at
+        });
+
+    }catch(e) {
+        return res.status(404).json({
+            "message": "Username or password not found"
+        });
+    }
+});
+
+router.post("/login/admin", async function(req, res) {
+    let username = req.body.username;
+    let pw = req.body.password;
+
+    if(username === "" || username == undefined || pw === "" || pw == undefined) {
+        return res.status(400).json({"message" : "username and password is required"});
+    }
+
+    try {
+        const user = await Entity.User.findOne({
+            where: {
+                username: username,
+                is_admin: true
             }
         });
 
