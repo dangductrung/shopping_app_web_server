@@ -10,7 +10,8 @@ var Report = sequilize.define('reports', {
     } ,
     title: DataTypes.STRING(255),
     content: DataTypes.STRING(1500),
-    product_id: DataTypes.INTEGER
+    product_id: DataTypes.INTEGER,
+    created_at: DataTypes.DATE,
 },  {timestamps: false,});
 
 

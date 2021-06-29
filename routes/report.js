@@ -4,6 +4,7 @@ var router = express.Router();
 const Entity = require('../helper/entity.helper');
 const  authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
+const dateFormat = require('dateformat');
 
 router.post('/add', async function(req, res) {
     let token = req.headers["token"];
@@ -45,11 +46,40 @@ router.post('/add', async function(req, res) {
         await Entity.Report.create({
             product_id: id,
             title: title,
-            content: content
+            content: content,
+            created_at: dateFormat(Date().toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd HH:MM:ss'),
         });
     
         return res.status(200).json({
             message: "Success"
+        });
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });  
+    }
+});
+
+
+router.get('/list', async function(req, res) {
+    let page = req.query.page;
+
+    if(page == null) {
+        page = 0;
+    }
+
+    try {
+        let reports = await Entity.Report.findAll({
+            limit: 10,
+            offset: page * 10,
+            order: [ [ 'created_at', 'DESC' ]]
+        });
+
+        let reports_count = await Entity.Report.findAll({});
+    
+        return res.status(200).json({
+            report: reports,
+            total: reports_count.length
         });
     } catch(e) {
         return res.status(400).json({
