@@ -56,6 +56,37 @@ router.post('/add', async function(req, res) {
     }
 });
 
+router.post('/unnew', async function(req, res) {
+    let token = req.headers["token"];
+    let id = req.query.id;
+
+    if(id == null || id === "" || id === undefined) {
+        return res.status(400).json({
+            message: "Error"
+        });    
+    }
+
+    try {
+        let username = await authhelper.getUserName(token);
+        let follow = await Entity.Follow.findOne({
+            where: {
+                id:id
+            }
+        });
+    
+        follow.is_new = false;
+        follow.save();
+    
+        return res.status(200).json({
+            message: "Success"
+        });
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });  
+    }
+});
+
 router.post('/unfollow', async function(req, res) {
     let token = req.headers["token"];
 
