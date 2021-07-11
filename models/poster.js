@@ -8,7 +8,8 @@ var Poster = sequilize.define('posters', {
         type: DataTypes.INTEGER,
     },
     title: DataTypes.STRING(255),
-    bg_color: DataTypes.STRING(255),
+    bg_color_start: DataTypes.STRING(255),
+    bg_color_end: DataTypes.STRING(255),
     txt_color: DataTypes.STRING(255),
 },  {timestamps: false,});
 
