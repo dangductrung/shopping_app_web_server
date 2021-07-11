@@ -29,6 +29,17 @@ router.get('/latest', async function(req, res) {
     }
 });
 
+router.get('/poster', async function(req, res) {
+    try {
+        let poster = await Entity.Poster.findOne();
+        return res.status(200).json(poster); 
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
 router.get('/chart', async function(req,res) {
     try {
         let id = req.query.product;

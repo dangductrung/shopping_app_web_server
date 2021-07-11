@@ -7,5 +7,6 @@ const Match = require('../models/match');
 const Notification = require('../models/notification');
 const FCM = require('../models/fcm');
 const Report = require('../models/report');
+const Poster = require('../models/poster');
 
-module.exports = {Product, Profile, Follow, Session, User, Match, Notification, FCM, Report};
+module.exports = {Product, Profile, Follow, Session, User, Match, Notification, FCM, Report, Poster};

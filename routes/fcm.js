@@ -26,6 +26,11 @@ router.post('/add', async function(req, res) {
 	            message: "Success"
 	        });        	
         } else {
+            await Entity.FCM.destroy({
+                where: {
+                    username: userName,
+                }
+            });
         	await Entity.FCM.create({
         		username: userName,
         		key: fcmtoken
