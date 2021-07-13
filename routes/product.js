@@ -12,6 +12,11 @@ router.get('/latest', async function(req, res) {
     try {
         let products = await Entity.Product.findAll(
             {
+                where: {
+                    match_id: {
+                        [Op.not]: null,
+                    }
+                },
                 limit: 10,
                 order: [ [ 'created_at', 'DESC' ]]
             }
@@ -64,7 +69,7 @@ router.get('/chart', async function(req,res) {
         });
 
         let products = await Entity.Product.findAll({
-            attributes: ["id", "current_price", "created_at"],
+            attributes: ["id", "current_price", "created_at", "link"],
             where: {
                 link: product.link
             },
@@ -75,7 +80,7 @@ router.get('/chart', async function(req,res) {
 
         if(otherProduct != null) {
             other_products = await Entity.Product.findAll({
-                attributes: ["id", "current_price", "created_at"],
+                attributes: ["id", "current_price", "created_at", "link"],
                 where: {
                     link: otherProduct.link
                 },

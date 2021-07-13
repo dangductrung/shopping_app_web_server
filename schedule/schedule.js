@@ -11,9 +11,10 @@ admin.initializeApp({
 });
 
 const check_notification = async () => {
-	const job = schedule.scheduleJob('*/2 * * * *', async function(fireDate) {
 	  await check();
-	});
+
+	// const job = schedule.scheduleJob('*/2 * * * *', async function(fireDate) {
+	// });
 }
 
 const check = async () => {
@@ -49,7 +50,8 @@ const check = async () => {
             		}
             	})
 
-            	await push_notificaion(notification, unread_count.length);
+            	// await push_notificaion(notification, unread_count.length);
+            	console.log("===================PUSH NOTIFICATION===================");
             }
 		}
 	}
