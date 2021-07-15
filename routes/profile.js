@@ -70,6 +70,12 @@ router.post('/changepw', async function(req,res) {
     	let oldPw = req.body.oldPw;
     	let newPw = req.body.newPw;
 
+    	if(newPw.length < 8) {
+    		return res.status(404).json({
+                "message": "Mật khẩu mới phải ít nhất 8 kí tự"
+            });
+    	}
+
         const user = await Entity.User.findOne({
             where: {
                 username: username
