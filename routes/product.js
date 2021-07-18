@@ -6,6 +6,7 @@ const Op = Sequelize.Op;
 const Entity = require('../helper/entity.helper');
 const authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
+const dateFormat = require('dateformat');
 
 router.get('/latest', async function(req, res) {
     let token = req.headers["token"];
@@ -157,6 +158,64 @@ router.get('/history', async function(req, res) {
             }
             result.push(object);
         }
+        return res.status(200).json(result); 
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
+router.get('/fluctuation', async function(req, res) {
+    try {
+        let result = [];
+
+        const currentDate = dateFormat(Date().toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd');
+
+        var msInDay = 86400000;
+        var daysToAdd = 1;
+        var now = new Date();
+        var milliseconds = now.getTime();
+        var newMillisecods = milliseconds + msInDay * daysToAdd;
+        var newDate = new Date(newMillisecods);
+        const nextDateString = dateFormat(newDate.toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd');
+
+        const startedDate = new Date(currentDate + " 07:00:00");
+        const endDate = new Date(nextDateString +  " 07:00:00");
+
+        let products = await Entity.Product.findAll({
+            where: {
+                created_at: {
+                    [Op.between]: [startedDate, nextDateString]
+                }
+            }
+        });
+
+        if(products != undefined && products.length > 0) {
+            for(i = 0;i<products.length; ++i) {
+                let historyPrds = await Entity.Product.findAll(
+                {
+                    where: {
+                        link: products[i].link,
+                    },
+                    limit: 2,
+                    order: [ [ 'created_at', 'DESC' ]]
+                });
+                if(historyPrds.length > 1) {
+                    let beforePrd = historyPrds[1];
+                    let delta = ((products[i].current_price - beforePrd.current_price) / beforePrd.current_price) * 100;
+
+                    if(delta < 0) {
+                        let object = {
+                            product: products[i],
+                            delta: Math.round(delta * 100) / 100
+                        }
+                        result.push(object);
+                    }
+                }
+            }    
+        }
+
         return res.status(200).json(result); 
     } catch(e) {
         return res.status(400).json({
