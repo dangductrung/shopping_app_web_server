@@ -61,13 +61,38 @@ router.get('/chart', async function(req,res) {
             key = "shopee"
         }
 
-        let otherProduct = await Entity.Product.findOne({
+        // TODO: Matching product history price
+        let otherProducts = await Entity.Product.findAll({
             where: {
                 match_id: product.match_id,
                 from: key
             }
         });
 
+        let other_products = [];
+
+        if(otherProducts != null && otherProducts.length > 0) {
+            let delta = 99999999;
+            let currentProduct = otherProducts[0];
+
+            for(i = 0; i<otherProducts.length; ++i) {
+                if(Math.abs(otherProducts[i].current_price - product.current_price) < delta) {
+                    delta = Math.abs(otherProducts[i].current_price - product.current_price);
+                    currentProduct = otherProducts[i];
+                }
+            }
+        
+            other_products = await Entity.Product.findAll({
+                attributes: ["id", "current_price", "created_at", "link"],
+                where: {
+                    link: currentProduct.link
+                },
+                order: [ [ 'created_at', 'ASC' ]]
+            });
+        }
+
+
+        // TODO: Product history price
         let products = await Entity.Product.findAll({
             attributes: ["id", "current_price", "created_at", "link"],
             where: {
@@ -76,17 +101,6 @@ router.get('/chart', async function(req,res) {
             order: [ [ 'created_at', 'ASC' ]]
         });
 
-        let other_products = [];
-
-        if(otherProduct != null) {
-            other_products = await Entity.Product.findAll({
-                attributes: ["id", "current_price", "created_at", "link"],
-                where: {
-                    link: otherProduct.link
-                },
-                order: [ [ 'created_at', 'ASC' ]]
-            });
-        }
 
         let shopees = [];
         let tikis = [];
@@ -103,6 +117,47 @@ router.get('/chart', async function(req,res) {
             "shopee": shopees,
             "tiki": tikis
         }); 
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
+router.get('/history', async function(req, res) {
+    try {
+        let id = req.query.product;
+        let product = await Entity.Product.findOne({
+            where: {
+                id: id
+            },
+        });
+
+        // TODO: Product history price
+        let products = await Entity.Product.findAll({
+            where: {
+                link: product.link
+            },
+            order: [ [ 'created_at', 'ASC' ]]
+        });
+
+        let result = [];
+
+        for(i = 0;i<products.length; ++i) {
+            let delta = 0.0;
+
+            if(i != 0) {
+                delta = ((products[i].current_price - products[i-1].current_price) / products[i-1].current_price) * 100;
+            } 
+
+            let object = {
+                price: products[i].current_price,
+                delta: Math.round(delta * 100) / 100,
+                created_at: products[i].created_at
+            }
+            result.push(object);
+        }
+        return res.status(200).json(result); 
     } catch(e) {
         return res.status(400).json({
             message: e.toString()
