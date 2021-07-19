@@ -18,15 +18,46 @@ router.get('/latest', async function(req, res) {
                         [Op.not]: null,
                     }
                 },
-                limit: 10,
-                order: [ [ 'created_at', 'DESC' ]]
+                limit: 30,
+                group: ['link'],
+                order: [ [ 'created_at', 'DESC' ]],
             }
         );
 
         let result = [];
-        for(i = 0 ; i<products.length; ++i) {
-            result.push(await producthelper.genPrd(products[i],token));
+
+        for(j = 0 ; j<products.length; j = j + 1) {
+            let product = products[j];
+
+            let key = "shopee";
+            if(product.from === "shopee") {
+                key = "tiki"
+            } else {
+                key = "shopee"
+            }
+            let otherProducts = await Entity.Product.findAll({
+                where: {
+                    match_id: product.match_id,
+                    from: key
+                }
+            });
+
+            if(otherProducts != null && otherProducts.length > 0) {
+                let delta = 99999999;
+                let currentProduct = otherProducts[0];
+
+                for(i = 0; i<otherProducts.length; ++i) {
+                    if(Math.abs(otherProducts[i].current_price < product.current_price) < delta) {
+                        delta = Math.abs(otherProducts[i].current_price - product.current_price);
+                        currentProduct = otherProducts[i];
+                    }
+                }
+                result.push(await producthelper.genPrd(currentProduct,token));
+            } else {
+                result.push(await producthelper.genPrd(product,token));
+            }
         }
+
         return res.status(200).json(result); 
     } catch(e) {
         return res.status(400).json({
@@ -167,6 +198,7 @@ router.get('/history', async function(req, res) {
 });
 
 router.get('/fluctuation', async function(req, res) {
+    let token = req.headers["token"];
     try {
         let result = [];
 
@@ -207,7 +239,7 @@ router.get('/fluctuation', async function(req, res) {
 
                     if(delta < 0) {
                         let object = {
-                            product: products[i],
+                            product: await producthelper.genPrd(products[i],token),
                             delta: Math.round(delta * 100) / 100
                         }
                         result.push(object);
