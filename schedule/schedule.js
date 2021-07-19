@@ -103,8 +103,6 @@ const push_notification = async (notification, unread_count, link) => {
 	  tokens: tokens,
 	}
 
-	console.log("TOKEN======================================================================== " + tokens)
-
 	admin.messaging().sendMulticast(message)
 	  .then((response) => {
 	    console.log(response.successCount + ' messages were sent successfully');
