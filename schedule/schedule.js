@@ -11,10 +11,9 @@ admin.initializeApp({
 });
 
 const check_notification = async () => {
+	const job = schedule.scheduleJob('*/2 * * * *', async function(fireDate) {
 	  await check();
-
-	// const job = schedule.scheduleJob('*/2 * * * *', async function(fireDate) {
-	// });
+	});
 }
 
 const check = async () => {
@@ -50,14 +49,13 @@ const check = async () => {
             		}
             	})
 
-            	// await push_notificaion(notification, unread_count.length);
-            	console.log("===================PUSH NOTIFICATION===================");
+            	await push_notification(notification, unread_count.length, follows[i].link);
             }
 		}
 	}
 }
 
-const push_notificaion = async (notification, unread_count) => {
+const push_notification = async (notification, unread_count, link) => {
 	let fcms = await Entity.FCM.findAll({
 		where: {
 			username: notification.username
@@ -93,7 +91,7 @@ const push_notificaion = async (notification, unread_count) => {
 	    title: notification.title,
 	    body: notification.body,
 	    type: notification.type, 
-	    content: notification.body
+	    content: link
 	  },
 	  android: android,
 	  apns: ios,
