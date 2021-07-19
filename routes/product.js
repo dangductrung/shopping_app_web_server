@@ -77,6 +77,28 @@ router.get('/poster', async function(req, res) {
     }
 });
 
+router.get('/info', async function(req, res) {
+    try {
+        let link = req.body.product;
+        let token = req.headers["token"];
+
+        let products = await Entity.Product.findAll(
+            {
+                where: {
+                    link: link,
+                },
+                limit: 1,
+                order: [ [ 'created_at', 'DESC' ]],
+            }
+        );
+        return res.status(200).json(await producthelper.genPrd(products[0],token)); 
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
 router.get('/chart', async function(req,res) {
     try {
         let id = req.query.product;

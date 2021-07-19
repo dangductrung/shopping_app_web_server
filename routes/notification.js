@@ -21,7 +21,9 @@ router.get('/list', async function(req, res) {
             limit: 10,
             offset: page * 10,
             order: [ [ 'created_at', 'DESC' ]]
-        })
+        });
+
+        
 
         return res.status(200).json(list); 
     } catch(e) {

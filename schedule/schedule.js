@@ -39,7 +39,8 @@ const check = async () => {
             		title: "Giá thay đổi",
             		body: "Giá " + product[0].name + " thay đổi: " + product[0].current_price,
             		created_at: dateFormat(Date().toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd HH:MM:ss'),
-            		is_read: false
+            		is_read: false,
+            		link: product[0].link
             	});
 
             	let unread_count = await Entity.Notification.findAll({
@@ -75,23 +76,23 @@ const push_notification = async (notification, unread_count, link) => {
       }
   	}
 
-  	 let android = {
-  	 	notification: {
-  	 		clickAction: "FLUTTER_NOTIFICATION_CLICK",
-  	 	},
-	    data: {
-	       title: notification.title,
-	       content: notification.body,
-	       type: notification.type, 
-	    }
-  	}
+  let android = {
+  	notification: {
+  	  clickAction: "FLUTTER_NOTIFICATION_CLICK",
+  	},
+	  data: {
+	    title: notification.title,
+	    content: notification.body,
+	    type: notification.type, 
+	  }
+  }
 
 	const message = {
 	  data: {
 	    title: notification.title,
 	    body: notification.body,
 	    type: notification.type, 
-	    content: link
+	    item_data: link
 	  },
 	  android: android,
 	  apns: ios,
@@ -101,6 +102,8 @@ const push_notification = async (notification, unread_count, link) => {
 	  },
 	  tokens: tokens,
 	}
+
+	console.log("TOKEN======================================================================== " + tokens)
 
 	admin.messaging().sendMulticast(message)
 	  .then((response) => {

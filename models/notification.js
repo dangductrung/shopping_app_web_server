@@ -13,7 +13,8 @@ var Notification = sequilize.define('notifications', {
     title: DataTypes.STRING(1000),
     created_at: DataTypes.DATE,
     username: DataTypes.STRING(255),
-    is_read: DataTypes.BOOLEAN
+    is_read: DataTypes.BOOLEAN,
+    link: DataTypes.STRING(1500)
 },  {timestamps: false,});
 
 
