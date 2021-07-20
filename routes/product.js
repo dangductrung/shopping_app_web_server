@@ -192,7 +192,7 @@ router.get('/history', async function(req, res) {
             where: {
                 link: product.link
             },
-            order: [ [ 'created_at', 'ASC' ]]
+            order: [ [ 'created_at', 'DESC' ]]
         });
 
         let result = [];
