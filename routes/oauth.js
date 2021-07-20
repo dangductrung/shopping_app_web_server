@@ -12,13 +12,26 @@ router.post("/register", async function(req, res)  {
     let pw = req.body.password;
 
     if(username === "" || username == undefined || pw === "" || pw == undefined) {
-        return res.status(400).json({"message" : "username and password is required"});
+        return res.status(400).json({"message" : "Tên đăng nhập và mật khẩu là bắt buộc"});
     }
 
     const salt = bcrypt.genSaltSync(parseInt(process.env.SALT));
     const hash = bcrypt.hashSync(pw, salt);
 
     try {
+        username = username.split(' ').join('');
+        pw = pw.split(' ').join('');
+        
+        const isExist = await Entity.User.findOne({
+            where: {
+                username: username
+            }
+        });
+
+        if(isExist != null || isExist != undefined) {
+            return res.status(400).json({"message" : "Tên đăng nhập đã tồn tại"});
+        }
+
         const user = await Entity.User.create({
             username: username,
             password: hash
@@ -46,7 +59,7 @@ router.post("/register", async function(req, res)  {
         });
     }catch(e) {
         return res.status(400).json({
-            "message": "Username already exists"
+            "message": e.toString()
         });
     }
 });
@@ -56,10 +69,13 @@ router.post("/login", async function(req, res) {
     let pw = req.body.password;
 
     if(username === "" || username == undefined || pw === "" || pw == undefined) {
-        return res.status(400).json({"message" : "username and password is required"});
+        return res.status(400).json({"message" : "Tên đăng nhập và mật khẩu là bắt buộc"});
     }
 
     try {
+        username = username.split(' ').join('');
+        pw = pw.split(' ').join('');
+        
         const user = await Entity.User.findOne({
             where: {
                 username: username,
@@ -69,14 +85,14 @@ router.post("/login", async function(req, res) {
 
         if(user == null) {
             return res.status(404).json({
-                "message": "Username or password not found"
+                "message": "Tên đăng nhập hoặc mật khẩu không tồn tại"
             });
         }
 
         const isValidate = bcrypt.compareSync(pw, user.password);
         if(!isValidate) {
             return res.status(400).json({
-                "message": "Password is incorrect"
+                "message": "Mật khẩu không đúng"
             });
         }
 
@@ -102,7 +118,7 @@ router.post("/login", async function(req, res) {
 
     }catch(e) {
         return res.status(404).json({
-            "message": "Username or password not found"
+            "message": "Tên đăng nhập không tồn tại"
         });
     }
 });
@@ -112,7 +128,7 @@ router.post("/login/admin", async function(req, res) {
     let pw = req.body.password;
 
     if(username === "" || username == undefined || pw === "" || pw == undefined) {
-        return res.status(400).json({"message" : "username and password is required"});
+        return res.status(400).json({"message" : "Tên đăng nhập và mật khẩu là bắt buộc"});
     }
 
     try {
@@ -125,14 +141,14 @@ router.post("/login/admin", async function(req, res) {
 
         if(user == null) {
             return res.status(404).json({
-                "message": "Username or password not found"
+                "message": "Tên đăng nhập hoặc mật khẩu không tồn tại"
             });
         }
 
         const isValidate = bcrypt.compareSync(pw, user.password);
         if(!isValidate) {
             return res.status(400).json({
-                "message": "Password is incorrect"
+                "message": "Mật khẩu không đúng"
             });
         }
 
@@ -158,7 +174,7 @@ router.post("/login/admin", async function(req, res) {
 
     }catch(e) {
         return res.status(404).json({
-            "message": "Username or password not found"
+            "message": "Tên đăng nhập không tồn tại"
         });
     }
 });

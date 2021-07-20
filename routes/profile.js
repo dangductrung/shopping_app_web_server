@@ -84,20 +84,20 @@ router.post('/changepw', async function(req,res) {
 
         if(oldPw === newPw) {
         	return res.status(404).json({
-                "message": "The new password is the same as the old password"
+                "message": "Mật khẩu mới trùng với mật khẩu cũ"
             });
         }
 
         if(user == null) {
             return res.status(404).json({
-                "message": "Username or password not found"
+                "message": "Tên đăng nhập không tồn tại"
             });
         }    	
 
     	const isValidate = bcrypt.compareSync(oldPw, user.password);
         if(!isValidate) {
             return res.status(400).json({
-                "message": "Password is incorrect"
+                "message": "Mật khẩu không đúng"
             });
         }
 
@@ -115,7 +115,7 @@ router.post('/changepw', async function(req,res) {
 	    result.save();
 
     	return res.status(200).json({
-	        message: "Success"
+	        message: "Thành công"
 	    });      
     } catch(e) {
     	return res.status(400).json({

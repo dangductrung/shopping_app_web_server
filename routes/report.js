@@ -14,19 +14,19 @@ router.post('/add', async function(req, res) {
 
     if(id == null || id === "" || id === undefined) {
         return res.status(400).json({
-            message: "Missing product"
+            message: "Thiếu thông tin sản phẩm"
         });    
     }
 
     if(title == null || title === "" || title === undefined) {
         return res.status(400).json({
-            message: "Missing title"
+            message: "Thiếu tiêu đề"
         });    
     }
 
     if(content == null || content === "" || content === undefined) {
         return res.status(400).json({
-            message: "Missing content"
+            message: "Thiếu nội dung"
         });    
     }
 
@@ -39,7 +39,7 @@ router.post('/add', async function(req, res) {
     
         if(product == null) {
             return res.status(404).json({
-                message: "Product not found"
+                message: "Không tìm thấy sản phẩm"
             });    
         }
     
@@ -51,7 +51,7 @@ router.post('/add', async function(req, res) {
         });
     
         return res.status(200).json({
-            message: "Success"
+            message: "Thành công"
         });
     } catch(e) {
         return res.status(400).json({

@@ -23,8 +23,6 @@ router.get('/list', async function(req, res) {
             order: [ [ 'created_at', 'DESC' ]]
         });
 
-        
-
         return res.status(200).json(list); 
     } catch(e) {
         return res.status(400).json({
@@ -38,7 +36,7 @@ router.post('/read', async function(req, res) {
 
     if(id == null || id === "" || id === undefined) {
         return res.status(400).json({
-            message: "Error"
+            message: "Lỗi"
         });    
     }
 
@@ -53,7 +51,7 @@ router.post('/read', async function(req, res) {
         notification.save();
 
         return res.status(200).json({
-            message: "Success"
+            message: "Thành công"
         });
     } catch(e) {
         return res.status(400).json({
@@ -81,7 +79,7 @@ router.post('/readAll', async function(req, res) {
         }
 
         return res.status(200).json({
-            message: "Success"
+            message: "Thành công"
         });
     } catch(e) {
         return res.status(400).json({

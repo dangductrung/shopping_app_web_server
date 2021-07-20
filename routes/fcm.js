@@ -10,7 +10,7 @@ router.post('/add', async function(req, res) {
 
     if(fcmtoken == null || fcmtoken == undefined || fcmtoken == "") {
     	return res.status(400).json({
-            "message": "FCM Token is empty string."
+            "message": "FCM Token rỗng."
         });
     }
 
@@ -23,7 +23,7 @@ router.post('/add', async function(req, res) {
         });
         if(checkEntity !=  null || checkEntity != undefined) {
 	        return res.status(200).json({
-	            message: "Success"
+	            message: "Thành công"
 	        });        	
         } else {
             await Entity.FCM.destroy({
@@ -36,7 +36,7 @@ router.post('/add', async function(req, res) {
         		key: fcmtoken
         	});
         	return res.status(200).json({
-	            message: "Success"
+	            message: "Thành công"
 	        }); 
         }
     }catch(e) {
@@ -52,7 +52,7 @@ router.delete('/remove', async function(req, res) {
 
     if(fcmtoken == null || fcmtoken == undefined || fcmtoken === "") {
     	return res.status(400).json({
-            "message": "FCM Token is empty string."
+            "message": "FCM Token rỗng."
         });
     }
 
@@ -65,7 +65,7 @@ router.delete('/remove', async function(req, res) {
         });
         if(checkEntity ==  null || checkEntity == undefined) {
 	        return res.status(400).json({
-	            message: "Token do not exist."
+	            message: "Token không tồn tại."
 	        });        	
         } else {
         	await Entity.FCM.destroy(
@@ -76,7 +76,7 @@ router.delete('/remove', async function(req, res) {
         	        	}}
         	);
         	return res.status(200).json({
-	            message: "Success"
+	            message: "Thành công"
 	        }); 
         }
     }catch(e) {

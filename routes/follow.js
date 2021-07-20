@@ -10,7 +10,7 @@ router.post('/add', async function(req, res) {
     let id = req.query.product;
     if(id == null || id === "" || id === undefined) {
         return res.status(400).json({
-            message: "Missing product"
+            message: "Thiếu thông tin sản phẩm"
         });    
     }
     try {
@@ -22,7 +22,7 @@ router.post('/add', async function(req, res) {
     
         if(product == null) {
             return res.status(404).json({
-                message: "Product not found"
+                message: "Không tìm thấy sản phẩm"
             });    
         }
     
@@ -35,7 +35,7 @@ router.post('/add', async function(req, res) {
         });
         if(follow != null) {
             return res.status(400).json({
-                message: "Error"
+                message: "Lỗi"
             });  
         }
     
@@ -47,7 +47,7 @@ router.post('/add', async function(req, res) {
         });
     
         return res.status(200).json({
-            message: "Success"
+            message: "Thành công"
         });
     } catch(e) {
         return res.status(400).json({
@@ -62,7 +62,7 @@ router.post('/unnew', async function(req, res) {
 
     if(id == null || id === "" || id === undefined) {
         return res.status(400).json({
-            message: "Error"
+            message: "Lỗi"
         });    
     }
 
@@ -78,7 +78,7 @@ router.post('/unnew', async function(req, res) {
         follow.save();
     
         return res.status(200).json({
-            message: "Success"
+            message: "Thành công"
         });
     } catch(e) {
         return res.status(400).json({
@@ -93,7 +93,7 @@ router.post('/unfollow', async function(req, res) {
     let id = req.query.product;
     if(id == null || id === "" || id === undefined) {
         return res.status(400).json({
-            message: "Missing product"
+            message: "Thiếu thông tin sản phẩm"
         });    
     }
     try {
@@ -105,7 +105,7 @@ router.post('/unfollow', async function(req, res) {
     
         if(product == null) {
             return res.status(404).json({
-                message: "Product not found"
+                message: "Không tìm thấy sản phẩm"
             });    
         }
     
@@ -118,7 +118,7 @@ router.post('/unfollow', async function(req, res) {
         });
         if(follow == null) {
             return res.status(400).json({
-                message: "Error"
+                message: "Lỗi"
             });  
         }
     
@@ -131,7 +131,7 @@ router.post('/unfollow', async function(req, res) {
         });
     
         return res.status(200).json({
-            message: "Success"
+            message: "Thành công"
         });
     } catch(e) {
         return res.status(400).json({
