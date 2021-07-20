@@ -271,11 +271,13 @@ router.get('/fluctuation', async function(req, res) {
                 if(historyPrds.length > 1) {
                     let beforePrd = historyPrds[1];
                     let delta = ((products[i].current_price - beforePrd.current_price) / beforePrd.current_price) * 100;
-                    let object = {
-                        product: await producthelper.genPrd(products[i],token),
-                        delta: Math.round(delta * 100) / 100
+                    if(delta < 0) {
+                        let object = {
+                            product: await producthelper.genPrd(products[i],token),
+                            delta: Math.round(delta * 100) / 100
+                        }
+                        result.push(object); 
                     }
-                    result.push(object);
                 }
             }    
         }
