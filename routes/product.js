@@ -77,7 +77,7 @@ router.get('/poster', async function(req, res) {
     }
 });
 
-router.get('/info', async function(req, res) {
+router.post('/info', async function(req, res) {
     try {
         let link = req.body.product;
         let token = req.headers["token"];
@@ -221,6 +221,11 @@ router.get('/history', async function(req, res) {
 
 router.get('/fluctuation', async function(req, res) {
     let token = req.headers["token"];
+    let page = req.query.page;
+
+    if(page == null) {
+        page = 0;
+    }
     try {
         let result = [];
 
@@ -242,7 +247,9 @@ router.get('/fluctuation', async function(req, res) {
                 created_at: {
                     [Op.between]: [startedDate, nextDateString]
                 }
-            }
+            },
+            limit: 10,
+            offset: page * 10,
         });
 
         if(products != undefined && products.length > 0) {
