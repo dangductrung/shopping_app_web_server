@@ -227,17 +227,23 @@ router.get('/fluctuation', async function(req, res) {
         page = 0;
     }
     try {
+        // TODO: Product history price
+        let finalPrd = await Entity.Product.findAll({
+            limit: 1,
+            order: [ [ 'created_at', 'DESC' ]],
+        });
+
         let result = [];
 
-        const currentDate = dateFormat(Date().toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd');
+        const currentDate = dateFormat(finalPrd[0].created_at, 'yyyy-mm-dd', "isoDateTime");
 
         var msInDay = 86400000;
         var daysToAdd = 1;
-        var now = new Date();
+        var now = finalPrd[0].created_at;
         var milliseconds = now.getTime();
         var newMillisecods = milliseconds + msInDay * daysToAdd;
         var newDate = new Date(newMillisecods);
-        const nextDateString = dateFormat(newDate.toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd');
+        const nextDateString = dateFormat(newDate, 'yyyy-mm-dd');
 
         const startedDate = new Date(currentDate + " 07:00:00");
         const endDate = new Date(nextDateString +  " 07:00:00");
@@ -265,14 +271,11 @@ router.get('/fluctuation', async function(req, res) {
                 if(historyPrds.length > 1) {
                     let beforePrd = historyPrds[1];
                     let delta = ((products[i].current_price - beforePrd.current_price) / beforePrd.current_price) * 100;
-
-                    if(delta < 0) {
-                        let object = {
-                            product: await producthelper.genPrd(products[i],token),
-                            delta: Math.round(delta * 100) / 100
-                        }
-                        result.push(object);
+                    let object = {
+                        product: await producthelper.genPrd(products[i],token),
+                        delta: Math.round(delta * 100) / 100
                     }
+                    result.push(object);
                 }
             }    
         }
