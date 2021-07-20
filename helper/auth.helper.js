@@ -43,7 +43,7 @@ const isAuthenticate = async (req, res, next) => {
     let token = req.headers["token"];
     if(!(await isAuth(token))) {
         return res.status(401).json({
-            message: "Unauthorized"
+            message: "Hết phiên đăng nhập"
         });
     } else {
         next();
