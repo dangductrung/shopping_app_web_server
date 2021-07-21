@@ -253,9 +253,7 @@ router.get('/fluctuation', async function(req, res) {
                 created_at: {
                     [Op.between]: [startedDate, nextDateString]
                 }
-            },
-            limit: 10,
-            offset: page * 10,
+            }
         });
 
         if(products != undefined && products.length > 0) {
@@ -279,7 +277,12 @@ router.get('/fluctuation', async function(req, res) {
                         result.push(object); 
                     }
                 }
-            }    
+            }
+            let limit = 10;
+            let offset = page * limit;
+            let finalOffset = (products.length > (offset + limit)) ? offset + limit : products.length;
+
+            result = result.slice(offset, finalOffset);    
         }
 
         return res.status(200).json(result); 
