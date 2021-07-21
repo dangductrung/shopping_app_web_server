@@ -92,7 +92,7 @@ const push_notification = async (notification, unread_count, link) => {
 	    title: notification.title,
 	    body: notification.body,
 	    type: notification.type, 
-	    item_data: link
+	    data: JSON.stringify(notification)
 	  },
 	  android: android,
 	  apns: ios,
