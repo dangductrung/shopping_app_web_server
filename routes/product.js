@@ -200,8 +200,8 @@ router.get('/history', async function(req, res) {
         for(i = 0;i<products.length; ++i) {
             let delta = 0.0;
 
-            if(i != 0) {
-                delta = ((products[i].current_price - products[i-1].current_price) / products[i-1].current_price) * 100;
+            if(i != (products.length - 1)) {
+                delta = ((products[i].current_price - products[i+1].current_price) / products[i+1].current_price) * 100;
             } 
 
             let object = {
