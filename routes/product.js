@@ -235,23 +235,23 @@ router.get('/fluctuation', async function(req, res) {
 
         let result = [];
 
-        const currentDate = dateFormat(finalPrd[0].created_at, 'yyyy-mm-dd', "isoDateTime");
+        const currentDate = dateFormat(finalPrd[0].created_at, 'yyyy-mm-dd HH:MM:ss', "isoDateTime");
 
         var msInDay = 86400000;
         var daysToAdd = 1;
         var now = finalPrd[0].created_at;
         var milliseconds = now.getTime();
-        var newMillisecods = milliseconds + msInDay * daysToAdd;
+        var newMillisecods = milliseconds - msInDay * daysToAdd;
         var newDate = new Date(newMillisecods);
-        const nextDateString = dateFormat(newDate, 'yyyy-mm-dd');
+        const previousDateString = dateFormat(newDate, 'yyyy-mm-dd HH:MM:ss');
 
-        const startedDate = new Date(currentDate + " 07:00:00");
-        const endDate = new Date(nextDateString +  " 07:00:00");
+        const startedDate = new Date(previousDateString);
+        const endDate = new Date(currentDate);
 
         let products = await Entity.Product.findAll({
             where: {
                 created_at: {
-                    [Op.between]: [startedDate, nextDateString]
+                    [Op.between]: [previousDateString, currentDate]
                 }
             }
         });
@@ -289,6 +289,7 @@ router.get('/fluctuation', async function(req, res) {
             }
             return res.status(200).json(result); 
         }
+        return res.status(200).json(result); 
 
     } catch(e) {
         return res.status(400).json({
