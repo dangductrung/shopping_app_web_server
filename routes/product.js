@@ -257,6 +257,10 @@ router.get('/fluctuation', async function(req, res) {
         });
 
         if(products != undefined && products.length > 0) {
+            let limit = 10;
+            let offset = page * limit;
+            let finalOffset = (products.length > (offset + limit)) ? offset + limit : products.length;
+
             for(i = 0;i<products.length; ++i) {
                 let historyPrds = await Entity.Product.findAll(
                 {
@@ -277,15 +281,15 @@ router.get('/fluctuation', async function(req, res) {
                         result.push(object); 
                     }
                 }
-            }
-            let limit = 10;
-            let offset = page * limit;
-            let finalOffset = (products.length > (offset + limit)) ? offset + limit : products.length;
 
-            result = result.slice(offset, finalOffset);    
+                if(result.length >= finalOffset) {
+                    result = result.slice(offset, finalOffset);    
+                    return res.status(200).json(result); 
+                }
+            }
+            return res.status(200).json(result); 
         }
 
-        return res.status(200).json(result); 
     } catch(e) {
         return res.status(400).json({
             message: e.toString()
