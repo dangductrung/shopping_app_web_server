@@ -44,7 +44,7 @@ router.post('/', async function(req, res) {
 
 
         prd_temp = prd_temp.sort((prd1,prd2) => prd1.current_price > prd2.current_price ? 1 : (prd1.current_price < prd2.current_price) ? -1 : 0);
-        prd_temp = prd_temp.slice(page * process.env.PAGE_LIMIT, (page + 1) * process.env.PAGE_LIMIT > prd_temp.length ? prd_temp.length : page * 10 + process.env.PAGE_LIMIT);
+        prd_temp = prd_temp.slice(page * process.env.PAGE_LIMIT, (page + 1) * process.env.PAGE_LIMIT > prd_temp.length ? prd_temp.length : page * process.env.PAGE_LIMIT + process.env.PAGE_LIMIT);
 
         for(i = 0; i < prd_temp.length; ++i) {
             result.push(await producthelper.genPrd(prd_temp[i], token));
