@@ -29,7 +29,7 @@ const check = async () => {
                     order: [ [ 'created_at', 'DESC' ]]
             });
 
-            if(product[0].current_price !== follows[i].current_price) {
+            if( Math.round(parseFloat(product[0].current_price)*100) != Math.round(parseFloat(follows[i].current_price)*100)) {
             	follows[i].is_new = true;
             	follows[i].current_price = product[0].current_price;
             	follows[i].save();
