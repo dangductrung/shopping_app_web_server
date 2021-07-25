@@ -257,7 +257,7 @@ router.get('/fluctuation', async function(req, res) {
         });
 
         if(products != undefined && products.length > 0) {
-            let limit = process.env.PAGE_LIMIT;
+            let limit = process.env.PAGE_LIMIT * 1;
             let offset = page * limit;
             let finalOffset = (products.length > (offset + limit)) ? offset + limit : products.length;
 
