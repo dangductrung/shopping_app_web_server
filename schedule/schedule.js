@@ -11,7 +11,7 @@ admin.initializeApp({
 });
 
 const check_notification = async () => {
-	const job = schedule.scheduleJob('*/30 * * * *', async function(fireDate) {
+	const job = schedule.scheduleJob('30 * * * *', async function(fireDate) {
 	  await check();
 	});
 }
@@ -38,7 +38,7 @@ const check = async () => {
             		type: "price_change",
             		title: "Giá thay đổi",
             		body: "Giá " + product[0].name + " thay đổi: " + product[0].current_price,
-            		created_at: dateFormat(Date().toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd HH:MM:ss'),
+            		created_at: dateFormat(new Date().toLocaleString("sv", { timeZone: "Asia/Ho_Chi_Minh" }), 'yyyy-mm-dd HH:MM:ss'),
             		is_read: false,
             		link: product[0].link
             	});
@@ -105,7 +105,7 @@ const push_notification = async (notification, unread_count, link) => {
 
 	admin.messaging().sendMulticast(message)
 	  .then((response) => {
-	    console.log(response.successCount + ' messages were sent successfully');
+	    console.log(response.successCount + ' messages were sent successfully - ' + new Date());
 	});
 }
 
