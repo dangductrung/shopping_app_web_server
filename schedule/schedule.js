@@ -11,7 +11,7 @@ admin.initializeApp({
 });
 
 const check_notification = async () => {
-	const job = schedule.scheduleJob('*/2 * * * *', async function(fireDate) {
+	const job = schedule.scheduleJob('*/30 * * * *', async function(fireDate) {
 	  await check();
 	});
 }
