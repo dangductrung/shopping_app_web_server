@@ -3,7 +3,7 @@ var router = express.Router();
 const Entity = require('../helper/entity.helper');
 const authhelper = require("../helper/auth.helper");
 const producthelper = require("../helper/product.helper");
-
+const dateFormat = require('dateformat');
 router.get('/list', async function(req, res) {
 	let token = req.headers["token"];
     let page = req.query.page;
@@ -18,10 +18,21 @@ router.get('/list', async function(req, res) {
             where: {
                 username: username
             },
-            limit: 10,
-            offset: page * 10,
+            limit: 20,
+            offset: page * 20,
             order: [ [ 'created_at', 'DESC' ]]
         });
+
+        if(list != undefined && list != null) {
+            if(list.length > 0) {
+                for(i = 0;i < list.length; ++i) {
+                    var now = new Date(list[i].created_at);
+                    var milliseconds = now.getTime();
+                    let newMillisecods = milliseconds + 25200000;
+                    list[i].created_at = dateFormat(new Date(newMillisecods), 'yyyy-mm-dd HH:MM:ss');
+                }
+            }
+        }
 
         return res.status(200).json(list); 
     } catch(e) {
