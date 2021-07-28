@@ -17,6 +17,7 @@ router.post('/', async function(req, res) {
     }
 
     try {
+        keyword = keyword.split("'").join("");
         let products = await Entity.Product.findAll({
             where: Sequelize.literal(`MATCH (name) AGAINST('${keyword}' IN NATURAL LANGUAGE MODE)`),
         });
