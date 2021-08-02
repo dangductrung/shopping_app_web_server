@@ -26,8 +26,6 @@ router.post('/', async function(req, res) {
         }
 
         let count = 0;
-
-        let result = [];
         let prd_temp = [];
 
         while(!(prd_temp.length >= (page + 1) * process.env.PAGE_LIMIT || count == products.length)) {
@@ -35,26 +33,31 @@ router.post('/', async function(req, res) {
             ++count;
         }
 
-        for(i = 0; i < prd_temp.length; ++i) {
-            let temp = prd_temp[i];
-            prd_temp = prd_temp.filter(function(item) {
-                return item.link !== prd_temp[i].link;
-            });
-            prd_temp.push(temp);
-        }
+        prd_temp.sort(function(a,b){
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
 
         let limit = process.env.PAGE_LIMIT*1;
-        let offset = page * limit;
+        let offset = page * limit + 1;
         let finalOffset = (prd_temp.length > (offset + limit)) ? (offset + limit) : prd_temp.length;
 
+        let result = [];
 
-        prd_temp = prd_temp.sort((prd1,prd2) => prd1.current_price > prd2.current_price ? 1 : (prd1.current_price < prd2.current_price) ? -1 : 0);
-        prd_temp = prd_temp.slice(offset, finalOffset);
+        for(i = 0; i<prd_temp.length ; ++i) {
+            if(result.length == finalOffset) {
+                return res.status(200).json(result.slice(offset, finalOffset));
+            }
+            let flag = false;
+            for(j = 0; j<result.length; ++j) {
+                if(result[j].link == prd_temp[i].link) {
+                    flag = true;
+                }
+            }
 
-        for(i = 0; i < prd_temp.length; ++i) {
-            result.push(await producthelper.genPrd(prd_temp[i], token));
+            if(flag == false) {
+                result.push(await producthelper.genPrd(prd_temp[i], token));
+            }
         }
-
         return res.status(200).json(result);
     }catch(e) {
         return res.status(400).json({
@@ -69,7 +72,8 @@ async function getList(product) {
             where: {
                 match_id: product.match_id,
             },
-            order: [ [ 'created_at', 'DESC' ]]
+            order: [ [ 'created_at', 'DESC' ]],
+            group: ['link'],
         }
     );
 
