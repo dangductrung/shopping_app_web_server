@@ -198,15 +198,9 @@ router.get('/history', async function(req, res) {
         let result = [];
 
         for(i = 0;i<products.length; ++i) {
-            let delta = 0.0;
-
-            if(i != (products.length - 1)) {
-                delta = ((products[i].current_price - products[i+1].current_price) / products[i+1].current_price) * 100;
-            } 
-
             let object = {
                 price: products[i].current_price,
-                delta: Math.round(delta * 100) / 100,
+                delta: products[i].delta,
                 created_at: products[i].created_at
             }
             result.push(object);
@@ -262,24 +256,12 @@ router.get('/fluctuation', async function(req, res) {
             let finalOffset = (products.length > (offset + limit)) ? offset + limit : products.length;
 
             for(i = 0;i<products.length; ++i) {
-                let historyPrds = await Entity.Product.findAll(
-                {
-                    where: {
-                        link: products[i].link,
-                    },
-                    limit: 2,
-                    order: [ [ 'created_at', 'DESC' ]]
-                });
-                if(historyPrds.length > 1) {
-                    let beforePrd = historyPrds[1];
-                    let delta = ((products[i].current_price - beforePrd.current_price) / beforePrd.current_price) * 100;
-                    if(delta < 0) {
-                        let object = {
-                            product: await producthelper.genPrd(products[i],token),
-                            delta: Math.round(delta * 100) / 100
-                        }
-                        result.push(object); 
+                if(products[i].delta < 0) {
+                    let object = {
+                        product: await producthelper.genPrd(products[i],token),
+                        delta: Math.round(products[i].delta * 100) / 100
                     }
+                    result.push(object); 
                 }
 
                 if(result.length >= finalOffset) {
@@ -291,6 +273,53 @@ router.get('/fluctuation', async function(req, res) {
         }
         return res.status(200).json(result); 
 
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
+router.get('/fluctuation/max', async function(req, res) {
+    let token = req.headers["token"];
+    try {
+        // TODO: Product history price
+        let finalPrd = await Entity.Product.findAll({
+            limit: 1,
+            order: [ [ 'created_at', 'DESC' ]],
+        });
+
+        const currentDate = dateFormat(finalPrd[0].created_at, 'yyyy-mm-dd HH:MM:ss', "isoDateTime");
+
+        var msInDay = 86400000;
+        var daysToAdd = 7;
+        var now = finalPrd[0].created_at;
+        var milliseconds = now.getTime();
+        var newMillisecods = milliseconds - msInDay * daysToAdd;
+        var newDate = new Date(newMillisecods);
+        const previousDateString = dateFormat(newDate, 'yyyy-mm-dd HH:MM:ss');
+
+        const startedDate = new Date(previousDateString);
+        const endDate = new Date(currentDate);
+
+        let minDelta = await Entity.Product.min('delta', 
+        {
+            where: {
+                created_at: {
+                    [Op.between]: [previousDateString, currentDate]
+                }
+            }
+        });
+
+        let minPrd = await Entity.Product.findOne({
+            where: {
+                delta: minDelta,
+                created_at: {
+                    [Op.between]: [previousDateString, currentDate]
+                }
+            }
+        });
+        return res.status(200).json(minPrd); 
     } catch(e) {
         return res.status(400).json({
             message: e.toString()
