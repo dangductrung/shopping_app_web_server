@@ -308,17 +308,24 @@ router.get('/fluctuation/max', async function(req, res) {
                 created_at: {
                     [Op.between]: [previousDateString, currentDate]
                 }
-            }
+            },
+                group: ['link'],
+                order: [ [ 'created_at', 'DESC' ]],
         });
+
+    let minValue = minDelta;
 
         let minPrd = await Entity.Product.findOne({
             where: {
-                delta: minDelta,
+                delta: minValue,
                 created_at: {
                     [Op.between]: [previousDateString, currentDate]
                 }
-            }
+            },
+                        group: ['link'],
+                order: [ [ 'created_at', 'DESC' ]],
         });
+
         return res.status(200).json(minPrd); 
     } catch(e) {
         return res.status(400).json({
