@@ -302,30 +302,38 @@ router.get('/fluctuation/max', async function(req, res) {
         const startedDate = new Date(previousDateString);
         const endDate = new Date(currentDate);
 
-        let minDelta = await Entity.Product.min('delta', 
-        {
+        let minPrds = await Entity.Product.findAll({
             where: {
                 created_at: {
-                    [Op.between]: [previousDateString, currentDate]
+                    [Op.gte]: previousDateString
                 }
             },
-                group: ['link'],
-                order: [ [ 'created_at', 'DESC' ]],
+            order: [ [ 'created_at', 'DESC' ]],
         });
 
-    let minValue = minDelta;
+        let temp = [];
+        let links = [];
+        let minPrd;
+        if(minPrds != null && minPrds != undefined && minPrds.length > 0) {
+            minPrds.sort(function(a,b){
+              return new Date(b.date) - new Date(a.date);
+            });
 
-        let minPrd = await Entity.Product.findOne({
-            where: {
-                delta: minValue,
-                created_at: {
-                    [Op.between]: [previousDateString, currentDate]
+            for(i = 0; i<minPrds.length; i++) {
+                if(links.includes(minPrds[i].link) == false) {
+                    temp.push(minPrds[i]);
+                    links.push(minPrds[i].link);
                 }
-            },
-                        group: ['link'],
-                order: [ [ 'created_at', 'DESC' ]],
-        });
+            }
 
+            minPrd = minPrds[0];
+            for(i = 0; i<temp.length; ++i) {
+                if(minPrd.delta > temp[i].delta) {
+                    minPrd = temp[i];
+                }
+            }
+        }
+        
         return res.status(200).json(minPrd); 
     } catch(e) {
         return res.status(400).json({
