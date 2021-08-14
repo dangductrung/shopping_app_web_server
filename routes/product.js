@@ -12,16 +12,16 @@ router.get('/latest', async function(req, res) {
     let token = req.headers["token"];
     try {
         let products = await Entity.Product.findAll(
-            {
-                where: {
-                    match_id: {
-                        [Op.not]: null,
-                    }
-                },
-                limit: 30,
-                group: ['link'],
-                order: [ [ 'created_at', 'DESC' ]],
-            }
+        {
+            where: {
+                match_id: {
+                    [Op.not]: null,
+                }
+            },
+            limit: 30,
+            group: ['link'],
+            order: [ [ 'created_at', 'DESC' ]],
+        }
         );
 
         let result = [];
@@ -83,13 +83,13 @@ router.post('/info', async function(req, res) {
         let token = req.headers["token"];
 
         let products = await Entity.Product.findAll(
-            {
-                where: {
-                    link: link,
-                },
-                limit: 1,
-                order: [ [ 'created_at', 'DESC' ]],
-            }
+        {
+            where: {
+                link: link,
+            },
+            limit: 1,
+            order: [ [ 'created_at', 'DESC' ]],
+        }
         );
         return res.status(200).json(await producthelper.genPrd(products[0],token)); 
     } catch(e) {
@@ -135,7 +135,7 @@ router.get('/chart', async function(req,res) {
                     currentProduct = otherProducts[i];
                 }
             }
-        
+
             other_products = await Entity.Product.findAll({
                 attributes: ["id", "current_price", "created_at", "link"],
                 where: {
@@ -247,13 +247,18 @@ router.get('/fluctuation', async function(req, res) {
                 created_at: {
                     [Op.between]: [previousDateString, currentDate]
                 }
-            }
+            },
+            order: [ [ 'delta', 'ASC' ]],
         });
 
         if(products != undefined && products.length > 0) {
             let limit = process.env.PAGE_LIMIT * 1;
             let offset = page * limit;
             let finalOffset = (products.length > (offset + limit)) ? offset + limit : products.length;
+
+            if(page > 0) {
+                offset = offset + 1;
+            }
 
             for(i = 0;i<products.length; ++i) {
                 if(products[i].delta < 0) {
@@ -282,6 +287,20 @@ router.get('/fluctuation', async function(req, res) {
 
 router.get('/fluctuation/max', async function(req, res) {
     let token = req.headers["token"];
+    let page = req.query.page;
+
+    if(page == null) {
+        page = 0;
+    }
+
+    let limit = process.env.PAGE_LIMIT*1;
+    let offset = page * limit;
+    let finalOffset = offset + limit;
+
+    if(page > 0) {
+        offset = offset + 1;
+    }
+
     try {
         // TODO: Product history price
         let finalPrd = await Entity.Product.findAll({
@@ -313,33 +332,136 @@ router.get('/fluctuation/max', async function(req, res) {
 
         let temp = [];
         let links = [];
-        let minPrd;
+        let result = [];
+
         if(minPrds != null && minPrds != undefined && minPrds.length > 0) {
             minPrds.sort(function(a,b){
               return new Date(b.date) - new Date(a.date);
-            });
+          });
 
             for(i = 0; i<minPrds.length; i++) {
                 if(links.includes(minPrds[i].link) == false) {
-                    temp.push(minPrds[i]);
+                    if(minPrds[i].delta < 0) {
+                        result.push(minPrds[i]);
+                    }
                     links.push(minPrds[i].link);
                 }
             }
 
-            minPrd = minPrds[0];
-            for(i = 0; i<temp.length; ++i) {
-                if(minPrd.delta > temp[i].delta) {
-                    minPrd = temp[i];
-                }
-            }
+            result.sort(function(a,b){
+                return a.delta - b.delta;
+            });
         }
+
+        finalOffset = result.length > finalOffset ? finalOffset : result.length;
         
-        return res.status(200).json(minPrd); 
+        return res.status(200).json(result.slice(offset, finalOffset)); 
     } catch(e) {
         return res.status(400).json({
             message: e.toString()
         });
     }
 });
+
+router.post('/track', async function(req, res) {
+    let token = req.headers["token"];
+    try {
+        let id = req.query.product;
+        let product = await Entity.Product.findOne({
+            where: {
+                id: id
+            },
+        });
+
+        let username = await authhelper.getUserName(token);
+        let tracking = await Entity.Track.findOne({
+            where: {
+                username: username,
+                match_id: product.match_id
+            }
+        });
+
+        if(tracking == undefined || tracking == null) {
+            const track = await Entity.Track.create({
+                username: username,
+                frequency: 1,
+                match_id: product.match_id
+            });
+        } else {
+            tracking.frequency = tracking.frequency + 1;
+            tracking.save();
+        }
+
+        return res.status(200).json({
+            message: "Success"
+        });
+
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
+router.get('/suggest', async function(req, res) {
+    let token = req.headers["token"];
+    let page = req.query.page;
+
+    if(page == null) {
+        page = 0;
+    }
+
+    let limit = process.env.PAGE_LIMIT*1;
+    let offset = page * limit;
+    let finalOffset = offset + limit;
+
+    if(page > 0) {
+        offset = offset + 1;
+    }
+
+    try {
+        let username = await authhelper.getUserName(token);
+        let tracks = await Entity.Track.findAll({
+            where: {
+                username: username
+            },
+            order: [ [ 'frequency', 'DESC' ]],
+        });
+
+        let result = [];
+        let links = [];
+
+        if(tracks != null && tracks != undefined) {
+            if(tracks.length != 0) {
+                for(i = 0; i<tracks.length; ++i) {
+                    let products = await Entity.Product.findAll({
+                        where: {
+                            match_id: tracks[i].match_id
+                        },
+                        order: [ [ 'created_at', 'DESC' ]],
+                    });
+
+                    for(j = 0; j < products.length; ++j) {
+                        if(links.includes(products[j].link) == false) {
+                            result.push(products[j]);
+                            links.push(products[j].link);
+                        }
+                    }
+
+                    if(result.length > finalOffset) {
+                        return res.status(200).json(result.slice(offset, finalOffset));
+                    }
+                }
+            }
+        }
+
+        return res.status(200).json(result.slice(offset, result.length));
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
 
 module.exports = router;

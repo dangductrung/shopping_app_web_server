@@ -35,12 +35,16 @@ router.post('/', async function(req, res) {
 
         prd_temp.sort(function(a,b){
           return new Date(b.created_at) - new Date(a.created_at);
-        });
+      });
 
         let limit = process.env.PAGE_LIMIT*1;
         let offset = page * limit + 1;
         let finalOffset = (prd_temp.length > (offset + limit)) ? (offset + limit) : prd_temp.length;
 
+        if(page > 0) {
+            offset = offset + 1;
+        }
+        
         let result = [];
 
         for(i = 0; i<prd_temp.length ; ++i) {
@@ -68,13 +72,13 @@ router.post('/', async function(req, res) {
 
 async function getList(product) {
     let prd_temp = await Entity.Product.findAll(
-        {
-            where: {
-                match_id: product.match_id,
-            },
-            order: [ [ 'created_at', 'DESC' ]],
-            group: ['link'],
-        }
+    {
+        where: {
+            match_id: product.match_id,
+        },
+        order: [ [ 'created_at', 'DESC' ]],
+        group: ['link'],
+    }
     );
 
     return prd_temp;
