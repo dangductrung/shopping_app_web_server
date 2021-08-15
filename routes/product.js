@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const { Sequelize, Model, DataTypes } = require('sequelize');
+const { Sequelize, Model, DataTypes, QueryTypes } = require('sequelize');
 const Op = Sequelize.Op;
+const sequelize = require("../ultils/serialize.server.util.js");
+
 
 const Entity = require('../helper/entity.helper');
 const authhelper = require("../helper/auth.helper");
@@ -518,6 +520,68 @@ router.get('/suggest', async function(req, res) {
         }
 
         return res.status(200).json(result.slice(offset, result.length));
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
+router.get('/statistic', async function(req, res) {
+    let token = req.headers["token"];
+    try {
+        let date = new Date();
+        let currentMonth = date.getMonth();
+
+        if(currentMonth == 0) {
+            currentMonth = 12;
+        }
+
+        let queryString = "SELECT * FROM flucs WHERE MONTH(time) = "+ currentMonth + " AND YEAR(time) = YEAR(CURRENT_DATE())";
+
+        const flucs = await sequelize.query(queryString, {
+            logging: console.log,
+            type: QueryTypes.SELECT
+        });
+
+        let shopees = [];
+        let tikis = [];
+
+        for(i =0; i < flucs.length; ++i) {
+            if(flucs[i].from == "shopee") {
+                shopees.push(flucs[i]);
+            } else {
+                tikis.push(flucs[i]);
+            }
+        }
+
+        shopees.sort(function(a,b){
+            return b.count - a.count;
+        });
+
+        tikis.sort(function(a,b){
+          return b.count - a.count;
+      });
+
+        shopees = shopees.slice(0, 2);
+        tikis = tikis.slice(0, 2);
+
+        let shopeesResult = [
+        new Date(new Date(shopees[0].time).setMonth(new Date(shopees[0].time).getMonth() + 1)),
+        new Date(new Date(shopees[1].time).setMonth(new Date(shopees[1].time).getMonth() + 1)),
+        ];
+
+        let tikiResult = [
+        new Date(new Date(tikis[0].time).setMonth(new Date(tikis[0].time).getMonth() + 1)),
+        new Date(new Date(tikis[1].time).setMonth(new Date(tikis[1].time).getMonth() + 1)),
+        ];
+
+        let result = {
+            "shopee": shopeesResult,
+            "tiki": tikiResult,
+        }
+
+        return res.status(200).json(result);
     } catch(e) {
         return res.status(400).json({
             message: e.toString()
