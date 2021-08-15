@@ -10,6 +10,7 @@ const genPrd = async (prd, token) => {
         link: prd.link,
         created_at: prd.created_at,
         current_price: prd.current_price,
+        delta: prd.delta,
         isFollow: await followhelper.isFollow(prd.link, token)
     };
 }

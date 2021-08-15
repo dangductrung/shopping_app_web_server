@@ -406,7 +406,7 @@ router.get('/fluctuation/max/list', async function(req, res) {
             for(i = 0; i<minPrds.length; i++) {
                 if(links.includes(minPrds[i].link) == false) {
                     if(minPrds[i].delta < 0) {
-                        result.push(minPrds[i]);
+                        result.push(await producthelper.genPrd(minPrds[i],token));
                     }
                     links.push(minPrds[i].link);
                 }
@@ -507,7 +507,7 @@ router.get('/suggest', async function(req, res) {
 
                     for(j = 0; j < products.length; ++j) {
                         if(links.includes(products[j].link) == false) {
-                            result.push(products[j]);
+                            result.push(await producthelper.genPrd(products[j],token));
                             links.push(products[j].link);
                         }
                     }
