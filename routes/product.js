@@ -287,6 +287,68 @@ router.get('/fluctuation', async function(req, res) {
 
 router.get('/fluctuation/max', async function(req, res) {
     let token = req.headers["token"];
+    try {
+        // TODO: Product history price
+        let finalPrd = await Entity.Product.findAll({
+            limit: 1,
+            order: [ [ 'created_at', 'DESC' ]],
+        });
+
+        const currentDate = dateFormat(finalPrd[0].created_at, 'yyyy-mm-dd HH:MM:ss', "isoDateTime");
+
+        var msInDay = 86400000;
+        var daysToAdd = 7;
+        var now = finalPrd[0].created_at;
+        var milliseconds = now.getTime();
+        var newMillisecods = milliseconds - msInDay * daysToAdd;
+        var newDate = new Date(newMillisecods);
+        const previousDateString = dateFormat(newDate, 'yyyy-mm-dd HH:MM:ss');
+
+        const startedDate = new Date(previousDateString);
+        const endDate = new Date(currentDate);
+
+        let minPrds = await Entity.Product.findAll({
+            where: {
+                created_at: {
+                    [Op.gte]: previousDateString
+                }
+            },
+            order: [ [ 'created_at', 'DESC' ]],
+        });
+
+        let temp = [];
+        let links = [];
+        let minPrd;
+        if(minPrds != null && minPrds != undefined && minPrds.length > 0) {
+            minPrds.sort(function(a,b){
+              return new Date(b.date) - new Date(a.date);
+          });
+
+            for(i = 0; i<minPrds.length; i++) {
+                if(links.includes(minPrds[i].link) == false) {
+                    temp.push(minPrds[i]);
+                    links.push(minPrds[i].link);
+                }
+            }
+
+            minPrd = minPrds[0];
+            for(i = 0; i<temp.length; ++i) {
+                if(minPrd.delta > temp[i].delta) {
+                    minPrd = temp[i];
+                }
+            }
+        }
+        
+        return res.status(200).json(minPrd); 
+    } catch(e) {
+        return res.status(400).json({
+            message: e.toString()
+        });
+    }
+});
+
+router.get('/fluctuation/max/list', async function(req, res) {
+    let token = req.headers["token"];
     let page = req.query.page;
 
     if(page == null) {
