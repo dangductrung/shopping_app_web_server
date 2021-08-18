@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const bodyParser = require('body-parser');
 const authhelper = require('./helper/auth.helper.js');
 const schedule = require('./schedule/schedule.js');
+const cors = require('cors');
 
 require('dotenv').config()
 require('events').EventEmitter.prototype._maxListeners = 100;
@@ -12,6 +13,14 @@ const enviromentName = "dev"
 app.use(morgan(enviromentName));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cors());
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 const port = process.env.PORT || 5000
 
 app.use('/oauth', require('./routes/oauth'));
@@ -27,13 +36,13 @@ app.use('/report', authhelper.isAuthenticate,require('./routes/report'));
 schedule.check_notification();
 
 var server=app.listen(4000, function(){
-    console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
-  });
+  console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
+});
 
 app.use(function (err, req, res, next) {
   console.error(err.stack)
   res.status(500).send('Something broke!')
 })
 
-  
+
 module.exports = app;
